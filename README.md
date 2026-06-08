@@ -1,12 +1,24 @@
 # SKIA-rPPG
 
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.x-red)
+![License](https://img.shields.io/badge/License-Research-green)
+
 Official implementation of:
 
 **SKIA: Static Kinematic-Informed Attention for Robust Remote Photoplethysmography under Lower-Face Motion Artifacts**
 
+<p align="center">
+  <img src="figures/skia_pipeline.png" width="95%">
+</p>
+
+<p align="center">
+Overview of the proposed SKIA framework.
+</p>
+
 ---
 
-## Overview
+# Overview
 
 SKIA-rPPG is a lightweight framework for robust remote photoplethysmography (rPPG) estimation under lower-face motion artifacts.
 
@@ -14,119 +26,119 @@ This project investigates how motion originating from the mouth and jaw regions 
 
 The framework combines:
 
-* Raw facial appearance information
-* Static lower-face suppressed representations
-* Temporal-difference motion cues
+- Raw facial appearance information
+- Static lower-face suppressed representations
+- Temporal-difference motion cues
 
 to improve blood volume pulse (BVP) reconstruction and heart-rate estimation robustness.
 
 ---
 
-## Main Contributions
+# Main Contributions
 
-* Systematic analysis of lower-face motion artifacts in rPPG.
-* Static lower-face suppression strategy for motion-robust physiological sensing.
-* Significant improvement of classical CHROM-based rPPG estimation.
-* SKIA-Net: a lightweight multi-stream spatiotemporal network.
-* Comprehensive ablation studies:
-
-  * Static vs dynamic masking
-  * Mask ratio selection
-  * Input stream combinations
-* Runtime benchmarking and frequency-domain analysis.
+- Systematic analysis of lower-face motion artifacts in rPPG.
+- Static lower-face suppression strategy for motion-robust physiological sensing.
+- Significant improvement of classical CHROM-based rPPG estimation.
+- SKIA-Net: a lightweight multi-stream spatiotemporal network.
+- Comprehensive ablation studies:
+  - Static vs Dynamic Masking
+  - Mask Ratio Selection
+  - Input Stream Combinations
+- Runtime benchmarking and frequency-domain analysis.
 
 ---
 
-## Main Results
+# Key Results
 
-### Classical CHROM Analysis
+## Classical CHROM Analysis
 
-| Method              | Pearson ↑  | HR MAE ↓  |
-| ------------------- | ---------- | --------- |
-| CHROM               | 0.3507     | 33.50     |
+| Method | Pearson ↑ | HR MAE ↓ |
+|----------|----------|----------|
+| CHROM | 0.3507 | 33.50 |
 | CHROM + Static Mask | **0.4166** | **23.44** |
 
-Additional statistics:
+Additional Statistics:
 
-* Winrate: 88.1%
-* Wilcoxon signed-rank p-value: 2.0 × 10⁻⁷
-
----
-
-### SKIA-Net Variants
-
-| Method            | Pearson ↑  | HR MAE ↓ |
-| ----------------- | ---------- | -------- |
-| SKIA Raw          | 0.6320     | 8.99     |
-| SKIA Masked       | 0.6246     | 7.55     |
-| SKIA Raw + Masked | 0.6844     | 4.97     |
-| SKIA Full         | **0.7522** | **3.73** |
+- Winrate: 88.1%
+- Wilcoxon Signed-Rank Test: p = 2.0 × 10⁻⁷
 
 ---
 
-### Mask Ratio Ablation
+## SKIA-Net Variants
 
-| Retained Facial Ratio | Mean Δ Pearson | Winrate   |
-| --------------------- | -------------- | --------- |
-| 0.5                   | -0.0210        | 40.5%     |
-| 0.6                   | +0.0592        | 81.0%     |
-| 0.7                   | **+0.0659**    | **88.1%** |
-| 0.8                   | +0.0410        | 85.7%     |
+| Method | Pearson ↑ | HR MAE ↓ |
+|----------|----------|----------|
+| SKIA Raw | 0.6320 | 8.99 |
+| SKIA Masked | 0.6246 | 7.55 |
+| SKIA Raw + Masked | 0.6844 | 4.97 |
+| SKIA Full | **0.7522** | **3.73** |
+
+---
+
+## Qualitative Reconstruction
+
+<p align="center">
+  <img src="figures/qualitative_figure.png" width="85%">
+</p>
+
+Example waveform reconstruction produced by SKIA-Net.
+
+---
+
+## Frequency-Domain Analysis
+
+<p align="center">
+  <img src="figures/fft_spectrum_comparison.png" width="80%">
+</p>
+
+Static lower-face suppression reduces spurious spectral peaks and strengthens the dominant cardiac frequency.
+
+---
+
+## Mask Ratio Ablation
+
+| Retained Facial Ratio | Mean Δ Pearson | Winrate |
+|----------|----------|----------|
+| 0.5 | -0.0210 | 40.5% |
+| 0.6 | +0.0592 | 81.0% |
+| 0.7 | **+0.0659** | **88.1%** |
+| 0.8 | +0.0410 | 85.7% |
 
 The best performance is achieved when retaining approximately 70% of the upper facial region.
 
 ---
 
-## Method Overview
+# Method Overview
 
 The proposed framework consists of three complementary streams:
 
-1. Raw Stream
+### Raw Stream
 
-   * Original facial video frames
+- Original facial video frames
 
-2. Masked Stream
+### Masked Stream
 
-   * Static lower-face suppression
-   * Preserves forehead and cheek regions
+- Static lower-face suppression
+- Preserves forehead and cheek regions
 
-3. Temporal-Difference Stream
+### Temporal-Difference Stream
 
-   * Frame-to-frame temporal residuals
-   * Captures short-term motion dynamics
+- Frame-to-frame temporal residuals
+- Captures short-term motion dynamics
 
 These representations are fused and processed by a lightweight spatiotemporal network to reconstruct the target BVP waveform.
 
 ---
 
-## Repository Structure
+# Repository Structure
 
 ```text
 SKIA-rPPG/
 ├── src/
-│   ├── train_skia.py
-│   ├── evaluate_skia_hr.py
-│   ├── skia_model.py
-│   ├── skia_dataset.py
-│   └── ...
-│
 ├── scripts/
-│   ├── precompute_frames.py
-│   ├── precompute_masks.py
-│   └── ...
-│
 ├── utils/
-│   ├── kinematic_mask.py
-│   └── ...
-│
 ├── figures/
-│   ├── qualitative_figure.png
-│   ├── fft_spectrum_comparison.png
-│   └── ...
-│
 ├── results/
-│   └── static_final_results.csv
-│
 ├── config.json
 ├── README.md
 └── .gitignore
@@ -134,13 +146,13 @@ SKIA-rPPG/
 
 ---
 
-## Dataset
+# Dataset
 
 This project uses the public UBFC-rPPG dataset.
 
 Dataset files are NOT included in this repository.
 
-Download UBFC-rPPG separately and organize the data as follows:
+Expected structure:
 
 ```text
 data/
@@ -155,9 +167,7 @@ data/
 
 ---
 
-## Installation
-
-Create a Python environment and install required packages:
+# Installation
 
 ```bash
 pip install torch torchvision numpy scipy pandas matplotlib tqdm opencv-python
@@ -165,7 +175,7 @@ pip install torch torchvision numpy scipy pandas matplotlib tqdm opencv-python
 
 ---
 
-## Data Preprocessing
+# Data Preprocessing
 
 ### Extract Frames
 
@@ -181,52 +191,48 @@ python scripts/precompute_masks_from_frames.py
 
 ---
 
-## Training
+# Training
 
 ### SKIA Raw
 
 ```bash
-python src/train_skia.py \
-    --mode raw
+python src/train_skia.py --mode raw
 ```
 
 ### SKIA Masked
 
 ```bash
-python src/train_skia.py \
-    --mode masked
+python src/train_skia.py --mode masked
 ```
 
 ### SKIA Raw + Masked
 
 ```bash
-python src/train_skia.py \
-    --mode raw_masked
+python src/train_skia.py --mode raw_masked
 ```
 
 ### SKIA Full
 
 ```bash
-python src/train_skia.py \
-    --mode full
+python src/train_skia.py --mode full
 ```
 
 ---
 
-## Evaluation
+# Evaluation
 
-### Classical CHROM Evaluation
+### CHROM Evaluation
 
 ```bash
 python src/evaluate_static_final.py
 ```
 
-### Heart-Rate Evaluation
+### Heart Rate Evaluation
 
 ```bash
 python src/evaluate_skia_hr.py \
-    --mode full \
-    --ckpt checkpoints/skia_full_best.pt
+  --mode full \
+  --ckpt checkpoints/skia_full_best.pt
 ```
 
 ### Mask Ratio Ablation
@@ -249,72 +255,69 @@ python src/benchmark_runtime.py
 
 ---
 
-## Experimental Setup
+# Experimental Setup
 
 ### Dataset
 
-* UBFC-rPPG
-* 42 subjects
+- UBFC-rPPG
+- 42 Subjects
 
-### Split
+### Train/Test Split
 
-Training Subjects:
-
-* 32 subjects
+Training Subjects: 32
 
 Testing Subjects:
 
-* subject43
-* subject44
-* subject45
-* subject46
-* subject47
-* subject48
-* subject49
-* subject5
-* subject8
-* subject9
+- subject43
+- subject44
+- subject45
+- subject46
+- subject47
+- subject48
+- subject49
+- subject5
+- subject8
+- subject9
 
 ### Training Configuration
 
-* Optimizer: Adam
-* Learning Rate: 1e-4
-* Loss: Negative Pearson Correlation Loss
-* Batch Size: 4
-* Clip Length: 128
-* Input Resolution: 128 × 128
+- Optimizer: Adam
+- Learning Rate: 1e-4
+- Loss: Negative Pearson Correlation Loss
+- Batch Size: 4
+- Clip Length: 128
+- Input Resolution: 128×128
 
 ### Hardware
 
-* NVIDIA A100-SXM4-80GB
+- NVIDIA A100-SXM4-80GB
 
 ---
 
-## Notes
+# Notes
 
-* Dataset files are excluded from version control.
-* Generated frame caches are excluded from version control.
-* Model checkpoints are excluded from version control.
-* Reported FPS values are measured on preloaded clips using GPU inference only.
-* Preprocessing and data loading time are not included in runtime benchmarks.
+- Dataset files are excluded from version control.
+- Frame caches are excluded from version control.
+- Model checkpoints are excluded from version control.
+- FPS measurements are obtained using GPU inference on preloaded clips.
+- Preprocessing and data loading time are excluded.
 
 ---
 
-## Future Directions
+# Future Directions
 
 This work serves as a foundation for future research on:
 
-* Motion-robust physiological sensing
-* Speaking-intensive physiological analysis
-* Human-computer interaction
-* Cognitive load estimation
-* Oral assessment and multimodal communication analysis
+- Motion-Robust Physiological Sensing
+- Speaking-Intensive Physiological Analysis
+- Human-Computer Interaction
+- Cognitive Load Estimation
+- Oral Assessment Systems
+- Multimodal Communication Analysis
 
 ---
 
-## Citation
-
-If you find this repository useful, please consider citing:
+# Citation
 
 ```bibtex
 @article{le2026skia,
@@ -328,10 +331,8 @@ If you find this repository useful, please consider citing:
 
 ---
 
-## License
+# License
 
 This repository is released for research and educational purposes.
-Dataset usage must comply with the original UBFC-rPPG license and terms of use.
 
-```
-```
+Dataset usage must comply with the original UBFC-rPPG license and terms of use.
